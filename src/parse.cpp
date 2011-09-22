@@ -4,6 +4,9 @@
 #include <iostream>
 #include <map>
 
+#include "stdlib.h"
+#include "stdio.h"
+
 using namespace std;
 
 #include <layout.h>

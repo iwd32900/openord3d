@@ -20,6 +20,8 @@
 #include <deque>
 #include <vector>
 
+#include "stdlib.h"
+
 using namespace std;
 
 // layout routines and constants

@@ -20,6 +20,9 @@
 #include <vector>
 #include <math.h>
 
+#include <algorithm>
+#include "stdlib.h"
+
 using namespace std;
 
 // layout routines and constants

@@ -19,7 +19,7 @@ public:
 
     // Methods
 	void init_parms ( int rand_seed, float edge_cut, float real_parm );
-    void graph::read_parms ( char *parms_file );
+    void read_parms ( char *parms_file );
 	void read_real ( char *real_file );
 	void scan_int ( char *filename );
 	void read_int ( char *file_name );

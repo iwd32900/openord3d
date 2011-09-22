@@ -21,6 +21,9 @@
 #include <deque>
 #include <vector>
 
+#include "string.h"
+#include "stdlib.h"
+
 using namespace std;
 
 // layout routines and constants

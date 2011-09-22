@@ -21,6 +21,8 @@
 #include <vector>
 #include <math.h>
 
+#include "stdlib.h"
+
 using namespace std;
 
 // parse command line

@@ -42,6 +42,8 @@
 #include <fstream>
 #include <math.h>
 
+#include "stdlib.h"
+
 #include <average_link_clust.h>
 
 // The constructor allocates the space necessary to run the

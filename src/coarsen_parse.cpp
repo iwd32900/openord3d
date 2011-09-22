@@ -5,6 +5,8 @@
 #include <map>
 #include <sstream>
 
+#include "stdlib.h"
+
 using namespace std;
 
 #include <coarsen_parse.h>

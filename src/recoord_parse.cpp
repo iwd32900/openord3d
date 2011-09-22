@@ -5,6 +5,8 @@
 #include <map>
 #include <sstream>
 
+#include "stdlib.h"
+
 using namespace std;
 
 #include <recoord_parse.h>
