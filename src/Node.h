@@ -15,13 +15,13 @@ class Node {
 				// position of this node
   int id;
   
-  float x,y;
-  float sub_x,sub_y;
+  float x,y,z;
+  float sub_x,sub_y,sub_z;
   float energy;
 
  public:
   
-  Node( int node_id ) { x = y = 0.0; fixed = false; 
+  Node( int node_id ) { x = y = z = 0.0; fixed = false; 
 						id = node_id; }
   ~Node() { }
   

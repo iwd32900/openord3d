@@ -342,7 +342,7 @@ void create_real ( map < string, int > &id_catalog, string coord_file, string re
   cout << "Reading .coord file ..." << endl;
   
   string id;
-  float x_coord, y_coord;
+  float x_coord, y_coord, z_coord;
   char id_buf[200];
   int ret;
 
@@ -365,7 +365,7 @@ void create_real ( map < string, int > &id_catalog, string coord_file, string re
   }
   
   // Read in all coordinates
-  while ((ret=fscanf(fp,"%[^\t]\t%f\t%f\n",id_buf,&x_coord,&y_coord)) && (ret!=EOF)) {
+  while ((ret=fscanf(fp,"%[^\t]\t%f\t%f\t%f\n",id_buf,&x_coord,&y_coord,&z_coord)) && (ret!=EOF)) {
 		
 		// Convert id to string
 		id = id_buf;
@@ -377,7 +377,7 @@ void create_real ( map < string, int > &id_catalog, string coord_file, string re
 		}
 		
 		// write out to .real file
-		out_real << id_catalog[id] << "\t" << x_coord << "\t" << y_coord << endl;
+		out_real << id_catalog[id] << "\t" << x_coord << "\t" << y_coord << "\t" << z_coord << endl;
 		
   }
 

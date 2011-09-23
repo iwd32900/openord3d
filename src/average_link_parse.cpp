@@ -28,7 +28,7 @@ void parse::print_syntax( const char *error_string )
 	   << "\tnode_id <tab> node_id <tab> weight" << endl
 	   << "  where node_id is a string, and weight is > 0." << endl << endl
 	   << "root_file.icoord is the output file from layout of the form" << endl
-	   << "\tnode_id <tab> x-coord <tab> y-coord" << endl << endl
+	   << "\tnode_id <tab> x-coord <tab> y-coord <tab> z-coord" << endl << endl
        << "root_file.iedges can also be output by layout, and contains" << endl
        << "  the edges remaining at the end of the ordination.  This" << endl
        << "  file should have the same format as root_file.full." << endl 

@@ -101,17 +101,17 @@ void create_coord ( map < int, string > &id_catalog, string icoord_file,
   cout << "Creating .coord file ..." << endl;
   
   int int_id;
-  float x_coord, y_coord;
+  float x_coord, y_coord, z_coord;
   while ( !in_coord.eof() )
   {
   
      int_id = -1;
-	 in_coord >> int_id >> x_coord >> y_coord;
+	 in_coord >> int_id >> x_coord >> y_coord >> z_coord;
 	 
 	 if ( int_id >= 0 )	// not at end of file
 	 {
 	   if ( id_catalog.find(int_id) != id_catalog.end() )
-	     out_coord << id_catalog[int_id] << "\t" << x_coord << "\t" << y_coord << endl;
+	     out_coord << id_catalog[int_id] << "\t" << x_coord << "\t" << y_coord << "\t" << z_coord << endl;
 	   else
 	   {
 	     cout << "Error: found unknown integer id." << endl;

@@ -48,16 +48,17 @@ void read_coord  ( string coord_file, map <string, int_node> &id_catalog )
   }
   
   string id;
-  float coord_x, coord_y;
+  float coord_x, coord_y, coord_z;
   while ( !coord_in.eof() )
   {
     id = "";
-    coord_in >> id >> coord_x >> coord_y;
+    coord_in >> id >> coord_x >> coord_y >> coord_z;
     if ( id != "" )    // check that line is not empty
       if ( id_catalog.find ( id ) == id_catalog.end() )
       {
         id_catalog[id].x = coord_x;
         id_catalog[id].y = coord_y;
+        id_catalog[id].z = coord_z;
       }
       else
       {
@@ -152,7 +153,8 @@ void read_edges_sim ( string edges_file, string sim_file, int num_short_links,
         {
             // compute distance between id1 and id2
             dist = sqrt ( pow((id_catalog[id1].x - id_catalog[id2].x),2) +
-                          pow((id_catalog[id1].y - id_catalog[id2].y),2) );
+                          pow((id_catalog[id1].y - id_catalog[id2].y),2) +
+                          pow((id_catalog[id1].z - id_catalog[id2].z),2) );
             if ( id_catalog[id1].id < id_catalog[id2].id )
               adj_mat[id_catalog[id1].id][id_catalog[id2].id] = dist;
             else
@@ -221,7 +223,8 @@ void read_edges_sim ( string edges_file, string sim_file, int num_short_links,
         {
             // compute distance between id1 and id2
             dist = sqrt ( pow((id_catalog[id1].x - id_catalog[id2].x),2) +
-                          pow((id_catalog[id1].y - id_catalog[id2].y),2) );
+                          pow((id_catalog[id1].y - id_catalog[id2].y),2) +
+                          pow((id_catalog[id1].z - id_catalog[id2].z),2) );
                           
             // save integer versions of id1,id2 for quick reference
             int_id1 = id_catalog[id1].id;
@@ -484,6 +487,7 @@ int main(int argc, char **argv)
       node_info[id_cat_iter->second.id].id = id_cat_iter->first;
       node_info[id_cat_iter->second.id].x = id_cat_iter->second.x;
       node_info[id_cat_iter->second.id].y = id_cat_iter->second.y;
+      node_info[id_cat_iter->second.id].z = id_cat_iter->second.z;
       temp_cat_iter = id_cat_iter;
       id_cat_iter++;
       id_catalog.erase ( temp_cat_iter );
@@ -546,8 +550,10 @@ int main(int argc, char **argv)
                  << dist_out_iter->first << "\t"
                  << node_info[int_id1].x << "\t"
                  << node_info[int_id1].y << "\t"
+                 << node_info[int_id1].z << "\t"
                  << node_info[int_id2].x << "\t"
-                 << node_info[int_id2].y << endl;
+                 << node_info[int_id2].y << "\t"
+                 << node_info[int_id2].z << endl;
       }
       dist_out.close();
       
@@ -587,7 +593,7 @@ int main(int argc, char **argv)
 
     int line_count;
     int pid1, pid2;
-    float dist, x1, y1, x2, y2;
+    float dist, x1, y1, x2, y2, z1, z2;
     average_link cluster ( node_info.size()-1, command_line.threshold );
     multimap < float, id_pair >::iterator sort_mat_iter;
     for ( sort_mat_iter = sorted_adj.begin();
@@ -599,8 +605,10 @@ int main(int argc, char **argv)
         dist = sort_mat_iter->first;
         x1 = node_info[pid1].x;
         y1 = node_info[pid1].y;
+        z1 = node_info[pid1].z;
         x2 = node_info[pid2].x;
         y2 = node_info[pid2].y;
+        z2 = node_info[pid2].z;
         
         /*
         // output table for debugging
@@ -609,7 +617,7 @@ int main(int argc, char **argv)
              << x2 << " " << y2 << " " << endl;
         */
         
-        cluster.next_line ( pid1, pid2, dist, x1, y1, x2, y2 );
+        cluster.next_line ( pid1, pid2, dist, x1, y1, x2, y2, z1, z2 );
     }
     
        

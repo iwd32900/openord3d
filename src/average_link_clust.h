@@ -20,7 +20,7 @@ public:
 
 	// Methods
 	void next_line ( int pid1, int pid2, float dist,
-                     float x1, float y1, float x2, float y2 );
+                     float x1, float y1, float z1, float x2, float y2, float z2 );
 	void output_clusters ( string filename, map <int, node> &node_info );
 
 	// Con/Decon
@@ -45,6 +45,7 @@ private:
     vector<float> sumdist;  // sum coord distances
     vector<float> sumX;     // sum X
     vector<float> sumY;     // sum Y
+    vector<float> sumZ;     // sum Z
     vector<int> nPapers;    // number of papers
     vector<int> nCords;     // number of coords
     vector<int> joinable;  // flag as to whether it is joinable after the threshold

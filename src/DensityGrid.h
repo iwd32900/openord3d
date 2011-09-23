@@ -23,7 +23,7 @@ public:
 	  void Init();
 	  void Subtract(Node &n, bool first_add, bool fine_first_add, bool fineDensity);
 	  void Add(Node &n, bool fineDensity );
-	  float GetDensity(float Nx, float Ny, bool fineDensity);
+	  float GetDensity(float Nx, float Ny, float Nz, bool fineDensity);
 
 	  // Contructor/Destructor
 	  DensityGrid() {};
@@ -38,9 +38,9 @@ private:
 	  void fineAdd( Node &N );
 
 	  // new dynamic variables -- SBM
-	  float (*fall_off)[RADIUS*2+1];
-	  float (*Density)[GRID_SIZE];
-	  deque<Node> (*Bins)[GRID_SIZE];
+	  float (*fall_off)[RADIUS*2+1][RADIUS*2+1];
+	  float (*Density)[GRID_SIZE][GRID_SIZE];
+	  deque<Node> (*Bins)[GRID_SIZE][GRID_SIZE];
 
 	  // old static variables
 	  //float fall_off[RADIUS*2+1][RADIUS*2+1];

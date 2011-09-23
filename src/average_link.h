@@ -18,6 +18,7 @@ struct int_node {
     int id;
     float x;
     float y;
+    float z;
 };
 
 // The node structure is the final format for storing node information 
@@ -25,6 +26,7 @@ struct node {
     string id;
     float x;
     float y;
+    float z;
 };
 
 // The id_pair structure is used to store indices of an edge pair

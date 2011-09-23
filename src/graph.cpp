@@ -327,15 +327,16 @@ void graph::read_real ( char *real_file )
   }
   
   int real_id;
-  float real_x, real_y;
+  float real_x, real_y, real_z;
   while ( !real_in.eof () )
   {
     real_id = -1;
-    real_in >> real_id >> real_x >> real_y;
+    real_in >> real_id >> real_x >> real_y >> real_z;
 	if ( real_id >= 0 )
 	{
 	  positions[id_catalog[real_id]].x = real_x;
 	  positions[id_catalog[real_id]].y = real_y;
+	  positions[id_catalog[real_id]].z = real_z;
 	  positions[id_catalog[real_id]].fixed = true;
 	  
 	  /*
@@ -665,8 +666,8 @@ void graph::update_nodes ( )
 {
 	
 	vector<int> node_indices;			// node list of nodes currently being updated
-	float old_positions[2*MAX_PROCS];	// positions before update
-	float new_positions[2*MAX_PROCS];	// positions after update
+	float old_positions[3*MAX_PROCS];	// positions before update
+	float new_positions[3*MAX_PROCS];	// positions after update
     
 	bool all_fixed;						// check if all nodes are fixed
 	
@@ -691,7 +692,7 @@ void graph::update_nodes ( )
 		{
 
 		  // advance random sequence according to myid
-		  for ( int j = 0; j < 2*myid; j++ )
+		  for ( int j = 0; j < 3*myid; j++ )
 		    rand();
 
 		  // calculate node energy possibilities
@@ -699,7 +700,7 @@ void graph::update_nodes ( )
 			update_node_pos ( i, old_positions, new_positions );
 
 		  // advance random sequence for next iteration
-		  for ( int j = 2*myid; j < 2*(node_indices.size()-1); j++ )
+		  for ( int j = 3*myid; j < 3*(node_indices.size()-1); j++ )
 		    rand();
 
 		}
@@ -707,7 +708,7 @@ void graph::update_nodes ( )
 		{
 		  // advance random sequence according to use by
 		  // the other processors
-		  for ( int j = 0; j < 2*(node_indices.size()); j++ )
+		  for ( int j = 0; j < 3*(node_indices.size()); j++ )
 		    rand();
 		}
 		
@@ -721,6 +722,7 @@ void graph::update_nodes ( )
 		if ( !all_fixed )
 		{
 		  #ifdef MUSE_MPI
+  		    // TODO - not updated for 3-D code b/c I'm not sure what to do...
   		    MPI_Allgather ( &new_positions[2*myid], 2, MPI_FLOAT,
 			  	            new_positions, 2, MPI_FLOAT, MPI_COMM_WORLD ); 
 		  #endif
@@ -758,14 +760,15 @@ void graph::update_nodes ( )
 // and returns the corresponding positions in an array.
 
 void graph::get_positions ( vector<int> &node_indices,
-			    float return_positions[2*MAX_PROCS]  )
+			    float return_positions[3*MAX_PROCS]  )
 {
 	
 	// fill positions
 	for(unsigned int i=0; i < node_indices.size(); i++)
 	{
-		return_positions[2*i] = positions[ node_indices[i] ].x;
-		return_positions[2*i+1] = positions[ node_indices[i] ].y;
+		return_positions[3*i] = positions[ node_indices[i] ].x;
+		return_positions[3*i+1] = positions[ node_indices[i] ].y;
+		return_positions[3*i+2] = positions[ node_indices[i] ].z;
 	}
 	
 }
@@ -776,13 +779,13 @@ void graph::get_positions ( vector<int> &node_indices,
 // generators.
 
 void graph::update_node_pos ( int node_ind,
-			      float old_positions[2*MAX_PROCS],
-			      float new_positions[2*MAX_PROCS] )
+			      float old_positions[3*MAX_PROCS],
+			      float new_positions[3*MAX_PROCS] )
 {	
 
 		float energies[2];			// node energies for possible positions
-		float updated_pos[2][2];	// possible positions
-		float pos_x, pos_y;
+		float updated_pos[2][3];	// possible positions
+		float pos_x, pos_y, pos_z;
 		
 		// old VxOrd parameter
 		float jump_length = .010 * temperature;
@@ -794,9 +797,10 @@ void graph::update_node_pos ( int node_ind,
 		energies[0] = Compute_Node_Energy ( node_ind );
 
 	        // move node to centroid position
-		Solve_Analytic ( node_ind, pos_x, pos_y );
+		Solve_Analytic ( node_ind, pos_x, pos_y, pos_z );
 		positions[node_ind].x = updated_pos[0][0] = pos_x;
 		positions[node_ind].y = updated_pos[0][1] = pos_y;
+		positions[node_ind].z = updated_pos[0][2] = pos_z;
 
 		/*
 		// ouput random numbers (for debugging)
@@ -809,10 +813,12 @@ void graph::update_node_pos ( int node_ind,
 		// Do random method (RAND_MAX is C++ maximum random number)
 		updated_pos[1][0] = updated_pos[0][0] + (.5 - rand()/(float)RAND_MAX) * jump_length;
 		updated_pos[1][1] = updated_pos[0][1] + (.5 - rand()/(float)RAND_MAX) * jump_length;
+		updated_pos[1][2] = updated_pos[0][2] + (.5 - rand()/(float)RAND_MAX) * jump_length;
 		
 		// compute node energy for random position
 		positions[node_ind].x = updated_pos[1][0];
 		positions[node_ind].y = updated_pos[1][1];
+		positions[node_ind].z = updated_pos[1][2];
 		energies[1] = Compute_Node_Energy ( node_ind );
 		
 		/*
@@ -823,8 +829,9 @@ void graph::update_node_pos ( int node_ind,
 		*/
 			 
 		// add back old position
-		positions[node_ind].x = old_positions[2*myid];
-		positions[node_ind].y = old_positions[2*myid+1];
+		positions[node_ind].x = old_positions[3*myid];
+		positions[node_ind].y = old_positions[3*myid+1];
+		positions[node_ind].z = old_positions[3*myid+2];
 		if ( !fineDensity && !first_add )
 			density_server.Add ( positions[node_ind], fineDensity );
 		else if ( !fine_first_add )
@@ -833,14 +840,16 @@ void graph::update_node_pos ( int node_ind,
 		// choose updated node position with lowest energy
 		if ( energies[0] < energies[1] )
 		{
-			new_positions[2*myid] = updated_pos[0][0];
-			new_positions[2*myid+1] = updated_pos[0][1];
+			new_positions[3*myid] = updated_pos[0][0];
+			new_positions[3*myid+1] = updated_pos[0][1];
+			new_positions[3*myid+2] = updated_pos[0][2];
 			positions[node_ind].energy = energies[0];
 		}
 		else
 		{
-			new_positions[2*myid] = updated_pos[1][0];
-			new_positions[2*myid+1] = updated_pos[1][1];
+			new_positions[3*myid] = updated_pos[1][0];
+			new_positions[3*myid+1] = updated_pos[1][1];
+			new_positions[3*myid+2] = updated_pos[1][2];
 			positions[node_ind].energy = energies[1];
 		}
 		
@@ -851,21 +860,23 @@ void graph::update_node_pos ( int node_ind,
 // new positions to the density grid.
 
 void graph::update_density ( vector<int> &node_indices,
-			     float old_positions[2*MAX_PROCS],
-			     float new_positions[2*MAX_PROCS] )
+			     float old_positions[3*MAX_PROCS],
+			     float new_positions[3*MAX_PROCS] )
 {
 	
 	// go through each node and subtract old position from
 	// density grid before adding new position
 	for ( unsigned int i = 0; i < node_indices.size(); i++ )
 	{
-		positions[node_indices[i]].x = old_positions[2*i];
-		positions[node_indices[i]].y = old_positions[2*i+1];
+		positions[node_indices[i]].x = old_positions[3*i];
+		positions[node_indices[i]].y = old_positions[3*i+1];
+		positions[node_indices[i]].z = old_positions[3*i+2];
 		density_server.Subtract ( positions[node_indices[i]],
 					  first_add, fine_first_add, fineDensity );
 		
-		positions[node_indices[i]].x = new_positions[2*i];
-		positions[node_indices[i]].y = new_positions[2*i+1];
+		positions[node_indices[i]].x = new_positions[3*i];
+		positions[node_indices[i]].y = new_positions[3*i+1];
+		positions[node_indices[i]].z = new_positions[3*i+2];
 		density_server.Add ( positions[node_indices[i]], fineDensity );
 	}	
 
@@ -886,7 +897,7 @@ float graph::Compute_Node_Energy( int node_ind )
 			attraction*attraction*2e-2;
 	
 	map <int,float>::iterator EI;
-	float x_dis,y_dis;
+	float x_dis,y_dis,z_dis;
 	float energy_distance, weight;
 	float node_energy=0;
 	
@@ -899,9 +910,10 @@ float graph::Compute_Node_Energy( int node_ind )
 		// Compute x,y distance
 		x_dis = positions[ node_ind ].x - positions[ EI->first ].x;
 		y_dis = positions[ node_ind ].y - positions[ EI->first ].y;
+		z_dis = positions[ node_ind ].z - positions[ EI->first ].z;
 		
 		// Energy Distance
-		energy_distance = x_dis*x_dis + y_dis*y_dis;
+		energy_distance = x_dis*x_dis + y_dis*y_dis + z_dis*z_dis;
 		if (STAGE<2) energy_distance *= energy_distance;
 
 		// In the liquid phase we want to discourage long link distances
@@ -914,7 +926,7 @@ float graph::Compute_Node_Energy( int node_ind )
 	//cout << "[before: " << node_energy;
 	
 	// add density
-	node_energy += density_server.GetDensity ( positions[ node_ind ].x, positions[ node_ind ].y,
+	node_energy += density_server.GetDensity ( positions[ node_ind ].x, positions[ node_ind ].y, positions[ node_ind ].z,
 											   fineDensity );
 
 	// after calling density server (debugging)
@@ -932,21 +944,22 @@ float graph::Compute_Node_Energy( int node_ind )
 * originally written by B. Wylie		     *
 *********************************************/
 
-void graph::Solve_Analytic( int node_ind, float &pos_x, float &pos_y )
+void graph::Solve_Analytic( int node_ind, float &pos_x, float &pos_y, float &pos_z )
 {
 
    map <int,float>::iterator EI;
    float total_weight = 0;
-   float x_dis, y_dis,x_cen=0, y_cen=0;
-   float x=0,y=0,dis;
+   float x_dis, y_dis, z_dis, x_cen=0, y_cen=0, z_cen=0;
+   float x=0,y=0,z=0,dis;
    float damping,weight;
 
    // Sum up all connections
    for(EI = neighbors[node_ind].begin(); EI != neighbors[node_ind].end(); ++EI) {
 		weight = EI->second;
 		total_weight += weight;
-		x +=  weight * positions[ EI->first ].x;  
+		x +=  weight * positions[ EI->first ].x;
 		y +=  weight * positions[ EI->first ].y;
+		z +=  weight * positions[ EI->first ].z;
    }
 
    // Now set node position
@@ -955,9 +968,11 @@ void graph::Solve_Analytic( int node_ind, float &pos_x, float &pos_y )
 		// Compute centriod
 		x_cen = x/total_weight;
 		y_cen = y/total_weight;
+		z_cen = z/total_weight;
 		damping = 1.0 - damping_mult;
 		pos_x = damping*positions[ node_ind ].x + (1.0-damping) * x_cen;
 		pos_y = damping*positions[ node_ind ].y + (1.0-damping) * y_cen;
+		pos_z = damping*positions[ node_ind ].z + (1.0-damping) * z_cen;
    }
    
    // No cut edge flag (?)
@@ -980,7 +995,8 @@ void graph::Solve_Analytic( int node_ind, float &pos_x, float &pos_y )
 
 		x_dis = x_cen - positions[ EI->first ].x;
 		y_dis = y_cen - positions[ EI->first ].y;
-		dis = x_dis*x_dis+y_dis*y_dis;
+		z_dis = z_cen - positions[ EI->first ].z;
+		dis = x_dis*x_dis+y_dis*y_dis+z_dis*z_dis;
 		dis *= num_connections;
 
 		// Store maximum edge
@@ -1012,7 +1028,7 @@ void graph::write_coord( const char *file_name )
   cout << "Writing out solution to " << file_name << " ..." << endl;
   
   for (unsigned int i = 0; i < positions.size(); i++) {
-    coordOUT << positions[i].id << "\t" << positions[i].x << "\t" << positions[i].y <<endl;
+    coordOUT << positions[i].id << "\t" << positions[i].x << "\t" << positions[i].y << "\t" << positions[i].z <<endl;
   }
   coordOUT.close();
   

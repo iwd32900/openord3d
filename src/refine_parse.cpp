@@ -48,7 +48,7 @@ void parse::print_syntax( const char *error_string )
 	   << "OPTIONS:" << endl << endl
        << "\t-l {int>=2} current coarsening level (not optional)" << endl
        << "\t            if 2 then reads from root_file.icoord and .clust" << endl
-	   << "\t-s {float} scale coordinates so they fit in a (2*float)^2 box" << endl
+	   << "\t-s {float} scale coordinates so they fit in a (2*float)^3 box" << endl
        << "\t-r convert _(l-1).coarse_int to _(l-1).refine_int" << endl << endl;
 		   
     exit(1);

@@ -92,7 +92,7 @@ void read_clust ( string clust_file, map <int, set<int> > &cluster_membership,
 void create_real ( string blob_file, string real_file,
 				   map < int, set<int> > clusters,
 				   set < int > &id_catalog,
-				   float scale, float x_scale, float y_scale )
+				   float scale, float x_scale, float y_scale, float z_scale )
 {
   cout << "Reading .icoord file ..." << endl;
   
@@ -112,12 +112,12 @@ void create_real ( string blob_file, string real_file,
 
   cout << "Writing .real file ..." << endl;
   int int_id;
-  float x_coord, y_coord;
+  float x_coord, y_coord, z_coord;
   set<int>::iterator clust_iter;
   while ( !blob_in.eof() )
   {
     int_id = -1;
-    blob_in >> int_id >> x_coord >> y_coord;
+    blob_in >> int_id >> x_coord >> y_coord >> z_coord;
     if ( int_id != -1 )    // check that line is not empty
 	    for ( clust_iter = clusters[int_id].begin();
 			  clust_iter != clusters[int_id].end();
@@ -126,10 +126,12 @@ void create_real ( string blob_file, string real_file,
 			id_catalog.insert ( *clust_iter );
 			if ( scale > 0.0 )
 				real_out << *clust_iter << "\t" << x_coord*scale/x_scale
-				         << "\t" << y_coord*scale/y_scale << endl;
+				         << "\t" << y_coord*scale/y_scale
+				         << "\t" << z_coord*scale/z_scale << endl;
 			else
 				real_out << *clust_iter << "\t" << x_coord
-				         << "\t" << y_coord << endl;
+				         << "\t" << y_coord
+				         << "\t" << z_coord << endl;
         }  
   }
 
@@ -142,7 +144,7 @@ void create_real ( string blob_file, string real_file,
 // (in absolute value) x and y values, so that the output file may be scaled
 // up or down according to the scale parameter
 
-void get_scales ( string coord_file, float &x_scale, float &y_scale )
+void get_scales ( string coord_file, float &x_scale, float &y_scale, float &z_scale )
 {
   cout << "Finding max and min x and y values for scaling ..." << endl;
   
@@ -153,22 +155,24 @@ void get_scales ( string coord_file, float &x_scale, float &y_scale )
     exit(1);
   }
 
-  float max_x, max_y, min_x, min_y;
-  max_x = max_y = -1.0;
-  min_x = min_y = 1.0;
-  float x_coord, y_coord;
+  float max_x, max_y, max_z, min_x, min_y, min_z;
+  max_x = max_y = max_z =-1.0;
+  min_x = min_y = min_z = 1.0;
+  float x_coord, y_coord, z_coord;
   int int_id;
   
   while ( !blob_in.eof() )
   {
     int_id = -1;
-    blob_in >> int_id >> x_coord >> y_coord;
+    blob_in >> int_id >> x_coord >> y_coord >> z_coord;
     if ( int_id != -1 )    // check that line is not empty
     {
 		if ( x_coord > max_x ) max_x = x_coord;
 		if ( x_coord < min_x ) min_x = x_coord;
 		if ( y_coord > max_y ) max_y = y_coord;
 		if ( y_coord < min_y ) min_y = y_coord;
+		if ( z_coord > max_z ) max_z = z_coord;
+		if ( z_coord < min_z ) min_z = z_coord;
     }  
   }
   
@@ -176,12 +180,16 @@ void get_scales ( string coord_file, float &x_scale, float &y_scale )
 
   if ( max_x > -min_x ) x_scale = max_x; else x_scale = -min_x;
   if ( max_y > -min_y ) y_scale = max_y; else y_scale = -min_y;
+  if ( max_z > -min_z ) z_scale = max_z; else z_scale = -min_z;
   
   //cout << "Found " << x_scale << " for x-coordinate scale, and " << y_scale
   //     << " for y-coordinate scale." << endl;  
 	   
   // preserve x/y aspect ratio
-  if ( x_scale > y_scale ) y_scale = x_scale; else x_scale = y_scale;
+  //if ( x_scale > y_scale ) y_scale = x_scale; else x_scale = y_scale;
+  if ( x_scale >= y_scale && x_scale >= z_scale ) y_scale = z_scale = x_scale;
+  else if ( y_scale >= x_scale && y_scale >= z_scale ) x_scale = z_scale = y_scale;
+  else if ( z_scale >= x_scale && z_scale >= y_scale ) x_scale = y_scale = z_scale;
 
   cout << "Using " << x_scale << " as scale factor." << endl;
 }
@@ -255,15 +263,15 @@ int main(int argc, char **argv)
 	*/	  
 	
 	// check if user wants us to scale the data
-	float x_scale, y_scale;
+	float x_scale, y_scale, z_scale;
 	if ( command_line.scale > 0 )
-	  get_scales ( command_line.blob_file, x_scale, y_scale );
+	  get_scales ( command_line.blob_file, x_scale, y_scale, z_scale );
 	   
 	// next we read the .blob file and output the .real file
 	set < int > id_catalog;
 	create_real ( command_line.blob_file, command_line.real_file,
 				  cluster_membership, id_catalog,
-				  command_line.scale, x_scale, y_scale );
+				  command_line.scale, x_scale, y_scale, z_scale );
 	
 	/*
 	// print out id_catalog (for debugging)

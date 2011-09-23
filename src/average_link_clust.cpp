@@ -75,7 +75,7 @@ average_link::average_link ( int set_max_paper_id, float set_threshold )
 }
 
 void average_link::next_line ( int pid1, int pid2, float dist,
-                              float x1, float y1, float x2, float y2 )
+                              float x1, float y1, float z1, float x2, float y2, float z2 )
 {
 
   // for debugging (test file input):
@@ -87,7 +87,7 @@ void average_link::next_line ( int pid1, int pid2, float dist,
   // local awk variables
   int cluster1, cluster2;//, temp; 
   int nPapers1, nPapers2, nCords1, nCords2;
-  float dx1, dx2, dy1, dy2, distclusters;
+  float dx1, dx2, dy1, dy2, dz1, dz2, distclusters;
   float avedist1, avedist2, distedge1, distedge2, dadd, expecteddist, Z;
    
   // nPairs keeps track of the number of lines we have done
@@ -115,6 +115,7 @@ void average_link::next_line ( int pid1, int pid2, float dist,
     sumdist[nClusters] = 2 * dist;
     sumX[nClusters] = x1 + x2;
     sumY[nClusters] = y1 + y2;
+    sumZ[nClusters] = z1 + z2;
     nPapers[nClusters] = 2;
     nCords[nClusters] = 2;
     //cout << "1 , " << dist << endl; 
@@ -139,6 +140,7 @@ void average_link::next_line ( int pid1, int pid2, float dist,
     sumdist[cluster2] += dist;
     sumX[cluster2] += x1;
     sumY[cluster2] += y1;
+    sumZ[cluster2] += z1;
     nPapers[cluster2]++;
     nCords[cluster2]++;
     if (dist <= THRESHOLD) {
@@ -161,6 +163,7 @@ void average_link::next_line ( int pid1, int pid2, float dist,
     sumdist[cluster1] += dist;
     sumX[cluster1] += x2;
     sumY[cluster1] += y2;
+    sumZ[cluster1] += z2;
     nPapers[cluster1]++;
     nCords[cluster1]++;
     if (dist <= THRESHOLD) {
@@ -189,8 +192,10 @@ void average_link::next_line ( int pid1, int pid2, float dist,
     dx2 = sumX[cluster2] / nPapers2;
     dy1 = sumY[cluster1] / nPapers1;
     dy2 = sumY[cluster2] / nPapers2;
+    dz1 = sumZ[cluster1] / nPapers1;
+    dz2 = sumZ[cluster2] / nPapers2;
 
-    distclusters = sqrt(((dx1 - dx2)*(dx1 - dx2)) + ((dy1 - dy2)*(dy1 - dy2)));
+    distclusters = sqrt(((dx1 - dx2)*(dx1 - dx2)) + ((dy1 - dy2)*(dy1 - dy2)) + ((dz1 - dz2)*(dz1 - dz2)));
     avedist1 = sumdist[cluster1] / nCords1;
     avedist2 = sumdist[cluster2] / nCords2;
     distedge1 = .564 * avedist1 * sqrt( (float)nPapers1 );
@@ -208,6 +213,7 @@ void average_link::next_line ( int pid1, int pid2, float dist,
         sumdist[nClusters] = sumdist[cluster1] + sumdist[cluster2] + dist;
         sumX[nClusters] = sumX[cluster1] + sumX[cluster2];
         sumY[nClusters] = sumY[cluster1] + sumY[cluster2];
+        sumZ[nClusters] = sumZ[cluster1] + sumZ[cluster2];
         nPapers[nClusters] = nPapers[cluster1] + nPapers[cluster2];
         nCords[nClusters] = nCords[cluster1] + nCords[cluster2] + 1;
         //cout << "-1 , " << dist << endl;

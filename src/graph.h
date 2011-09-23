@@ -38,13 +38,13 @@ private:
 	int ReCompute ( );
 	void update_nodes ( );
 	float Compute_Node_Energy ( int node_ind );
-	void Solve_Analytic ( int node_ind, float &pos_x, float &pos_y );
-	void get_positions ( vector<int> &node_indices, float return_positions[2*MAX_PROCS] );
-	void update_density ( vector<int> &node_indices, float old_positions[2*MAX_PROCS],
-			      float new_positions[2*MAX_PROCS] );
+	void Solve_Analytic ( int node_ind, float &pos_x, float &pos_y, float &pos_z );
+	void get_positions ( vector<int> &node_indices, float return_positions[3*MAX_PROCS] );
+	void update_density ( vector<int> &node_indices, float old_positions[3*MAX_PROCS],
+			      float new_positions[3*MAX_PROCS] );
 	void update_node_pos ( int node_ind,
-			       float old_positions[2*MAX_PROCS],
-			       float new_positions[2*MAX_PROCS] );
+			       float old_positions[3*MAX_PROCS],
+			       float new_positions[3*MAX_PROCS] );
 								  
 	// MPI information
 	int myid, num_procs;

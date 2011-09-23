@@ -36,7 +36,7 @@ void parse::print_syntax( const char *error_string )
 	   << "root_file.icoord -- the resulting output file, containing an ordination" << endl
 	   << "  of the graph.  The .icoord file will have the suffix \".icoord\" and" << endl
 	   << "  each line of the .icoord file will be of the form" << endl
-	   << "\tnode_id <tab> x-coord <tab> y-coord" << endl << endl
+	   << "\tnode_id <tab> x-coord <tab> y-coord <tab> z-coord" << endl << endl
 	   << "Options:" << endl << endl
 	   << "\t-s {int>=0} random seed (default value is 0)" << endl
 	   << "\t-c {real[0,1]} edge cutting (default 32/40 = .8)" << endl
