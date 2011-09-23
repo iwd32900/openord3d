@@ -37,9 +37,15 @@
 
 // small values for 3D clustering on 32-bit machines!
 #define GRID_SIZE 128			// size of VxOrd Density grid
-#define VIEW_SIZE 512.0		// actual physical size of VxOrd plane
+// not used anywhere:
+//#define VIEW_SIZE 512.0		// actual physical size of VxOrd plane
 #define RADIUS 5				// radius for density fall-off
 
+// To avoid reaching outsie the DensityGrid when converting real coordinates to grid positions,
+// for -HALF_VIEW <= xyz <= +HALF_VIEW,
+// 0 + RADIUS <= ((xyz + HALF_VIEW + 0.5) * VIEW_TO_GRID) < GRID_SIZE - RADIUS
+// This is NOT POSSIBLE when xyz == -HALF_VIEW ...
 #define HALF_VIEW 256			// 1/2 of VIEW_SIZE
-#define VIEW_TO_GRID 0.25		// ratio of GRID_SIZE to VIEW_SIZE
+//#define VIEW_TO_GRID 0.25		// ratio of GRID_SIZE to VIEW_SIZE
+#define VIEW_TO_GRID (GRID_SIZE - 2*RADIUS - 1) / (2.0 * HALF_VIEW)		// ratio of GRID_SIZE to VIEW_SIZE
 

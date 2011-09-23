@@ -83,13 +83,13 @@ float DensityGrid::GetDensity(float Nx, float Ny, float Nz, bool fineDensity)
 	deque<Node>::iterator BI;
 	int x_grid, y_grid, z_grid;
 	float x_dist, y_dist, z_dist, distance, density=0;
-	int boundary=10;	// boundary around plane
+	int boundary = RADIUS;	// boundary around plane
 
 
 	/* Where to look */
-	x_grid = (int)((Nx+HALF_VIEW+.5)*VIEW_TO_GRID);
-	y_grid = (int)((Ny+HALF_VIEW+.5)*VIEW_TO_GRID);
-	z_grid = (int)((Nz+HALF_VIEW+.5)*VIEW_TO_GRID);
+	x_grid = (int)((Nx+HALF_VIEW+.5)*VIEW_TO_GRID)+RADIUS;
+	y_grid = (int)((Ny+HALF_VIEW+.5)*VIEW_TO_GRID)+RADIUS;
+	z_grid = (int)((Nz+HALF_VIEW+.5)*VIEW_TO_GRID)+RADIUS;
 
 	// Check for edges of density grid (10000 is arbitrary high density)
 	if (x_grid > GRID_SIZE-boundary || x_grid < boundary) return 10000;
@@ -155,9 +155,9 @@ void DensityGrid::Subtract(Node &N)
   float *den_ptr, *fall_ptr;
 	
   /* Where to subtract */
-  x_grid = (int)((N.sub_x+HALF_VIEW+.5)*VIEW_TO_GRID);
-  y_grid = (int)((N.sub_y+HALF_VIEW+.5)*VIEW_TO_GRID);
-  z_grid = (int)((N.sub_z+HALF_VIEW+.5)*VIEW_TO_GRID);
+  x_grid = (int)((N.sub_x+HALF_VIEW+.5)*VIEW_TO_GRID)+RADIUS;
+  y_grid = (int)((N.sub_y+HALF_VIEW+.5)*VIEW_TO_GRID)+RADIUS;
+  z_grid = (int)((N.sub_z+HALF_VIEW+.5)*VIEW_TO_GRID)+RADIUS;
   x_grid -= RADIUS;
   y_grid -= RADIUS;
   z_grid -= RADIUS;
@@ -189,9 +189,9 @@ void DensityGrid::Add(Node &N)
 
 
   /* Where to add */
-  x_grid = (int)((N.x+HALF_VIEW+.5)*VIEW_TO_GRID);
-  y_grid = (int)((N.y+HALF_VIEW+.5)*VIEW_TO_GRID);
-  z_grid = (int)((N.z+HALF_VIEW+.5)*VIEW_TO_GRID);
+  x_grid = (int)((N.x+HALF_VIEW+.5)*VIEW_TO_GRID)+RADIUS;
+  y_grid = (int)((N.y+HALF_VIEW+.5)*VIEW_TO_GRID)+RADIUS;
+  z_grid = (int)((N.z+HALF_VIEW+.5)*VIEW_TO_GRID)+RADIUS;
  
   N.sub_x = N.x;
   N.sub_y = N.y;
@@ -207,9 +207,9 @@ void DensityGrid::Add(Node &N)
        (y_grid >= GRID_SIZE) || (y_grid < 0) ||
        (z_grid >= GRID_SIZE) || (z_grid < 0) )
     {
-      cout << endl << "Error: Exceeded density grid with x_grid = " << x_grid 
-	       << " and y_grid = " << y_grid
-	       << " and z_grid = " << z_grid << ".  Program stopped." << endl;
+      cout << endl << "Error: Exceeded density grid with x_grid = " << x_grid << " (" << N.x << ")"
+	       << " and y_grid = " << y_grid << " (" << N.y << ")"
+	       << " and z_grid = " << z_grid << " (" << N.z << ")" << ".  Program stopped." << endl;
       #ifdef MUSE_MPI
  	    MPI_Abort ( MPI_COMM_WORLD, 1 );
 	  #else
@@ -240,9 +240,9 @@ void DensityGrid::fineSubtract(Node &N)
   int x_grid, y_grid, z_grid;
 
   /* Where to subtract */
-  x_grid = (int)((N.sub_x+HALF_VIEW+.5)*VIEW_TO_GRID);
-  y_grid = (int)((N.sub_y+HALF_VIEW+.5)*VIEW_TO_GRID);
-  z_grid = (int)((N.sub_z+HALF_VIEW+.5)*VIEW_TO_GRID);
+  x_grid = (int)((N.sub_x+HALF_VIEW+.5)*VIEW_TO_GRID)+RADIUS;
+  y_grid = (int)((N.sub_y+HALF_VIEW+.5)*VIEW_TO_GRID)+RADIUS;
+  z_grid = (int)((N.sub_z+HALF_VIEW+.5)*VIEW_TO_GRID)+RADIUS;
   Bins[z_grid][y_grid][x_grid].pop_front();
 }
 
@@ -255,9 +255,9 @@ void DensityGrid::fineAdd(Node &N)
   int x_grid, y_grid, z_grid;
 
   /* Where to add */
-  x_grid = (int)((N.x+HALF_VIEW+.5)*VIEW_TO_GRID);
-  y_grid = (int)((N.y+HALF_VIEW+.5)*VIEW_TO_GRID);
-  z_grid = (int)((N.z+HALF_VIEW+.5)*VIEW_TO_GRID);
+  x_grid = (int)((N.x+HALF_VIEW+.5)*VIEW_TO_GRID)+RADIUS;
+  y_grid = (int)((N.y+HALF_VIEW+.5)*VIEW_TO_GRID)+RADIUS;
+  z_grid = (int)((N.z+HALF_VIEW+.5)*VIEW_TO_GRID)+RADIUS;
   N.sub_x = N.x;
   N.sub_y = N.y;
   N.sub_z = N.z;
