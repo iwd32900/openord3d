@@ -10,6 +10,8 @@
 
 // Compile time adjustable parameters for the Density grid
 
+/*
+// new values for OpenOrd -- too much memory for 3D on a 32-bit address space!
 #define GRID_SIZE 1000			// size of Density grid
 #define VIEW_SIZE 4000.0		// actual physical size of layout plane
 								// these values use more memory but have
@@ -21,6 +23,7 @@
 
 #define HALF_VIEW 2000			// 1/2 of VIEW_SIZE
 #define VIEW_TO_GRID .25		// ratio of GRID_SIZE to VIEW_SIZE
+*/
 
 /*
 // original values for VxOrd
@@ -31,3 +34,12 @@
 #define HALF_VIEW 800			// 1/2 of VIEW_SIZE
 #define VIEW_TO_GRID .25		// ratio of GRID_SIZE to VIEW_SIZE
 */
+
+// small values for 3D clustering on 32-bit machines!
+#define GRID_SIZE 128			// size of VxOrd Density grid
+#define VIEW_SIZE 512.0		// actual physical size of VxOrd plane
+#define RADIUS 5				// radius for density fall-off
+
+#define HALF_VIEW 256			// 1/2 of VIEW_SIZE
+#define VIEW_TO_GRID 0.25		// ratio of GRID_SIZE to VIEW_SIZE
+
