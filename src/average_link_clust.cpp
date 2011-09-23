@@ -66,6 +66,7 @@ average_link::average_link ( int set_max_paper_id, float set_threshold )
     sumdist.assign ( max_paper_id+1, (float)0.0 );
     sumX.assign ( max_paper_id+1, (float)0.0 );
     sumY.assign ( max_paper_id+1, (float)0.0 );
+    sumZ.assign ( max_paper_id+1, (float)0.0 );
     nPapers.assign ( max_paper_id+1, 0 );
     nCords.assign ( max_paper_id+1, 0 );
     joinable.assign ( max_paper_id+1, 0 );
